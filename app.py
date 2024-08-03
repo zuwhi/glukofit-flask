@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import joblib
-from array import array
+import numpy as np
 
 app = Flask(__name__)
 
@@ -14,11 +14,8 @@ def predict():
         data = request.get_json()
 
         # Extract features from the request
-        features = array('d', data['features'])  # 'd' untuk double (float)
+        features = np.array(data['features']).reshape(1, -1)
 
-        # Convert array to a list and reshape
-        features = [features]
-        
         # Scale features
         scaled_features = scaler.transform(features)
 
