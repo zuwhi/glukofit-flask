@@ -1,32 +1,29 @@
 from flask import Flask, request, jsonify
-import joblib
-import numpy as np
+import pickle
+import pandas as pd
 
 app = Flask(__name__)
 
-# Load model and scaler from the same directory as this script
-model = joblib.load('logistic_regression_model.pkl')
-scaler = joblib.load('scaler.pkl')
+# Muat model yang sudah dilatih
+model = pickle.load(open('best_model.pkl', 'rb'))
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        data = request.get_json()
+    # Ambil data dari request
+    data = request.get_json()
 
-        # Extract features from the request
-        features = np.array(data['features']).reshape(1, -1)
-
-        # Scale features
-        scaled_features = scaler.transform(features)
-
-        # Predict
-        prediction = model.predict(scaled_features)
-
-        # Return result
-        return jsonify({'prediction': int(prediction[0])})
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+    # Konversi data ke DataFrame
+    df = pd.DataFrame(data)
+    
+    # Lakukan prediksi dengan model
+    predictions = model.predict(df)
+    
+    # Buat response
+    response = {
+        'predictions': predictions.tolist()
+    }
+    
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(debug=True)
