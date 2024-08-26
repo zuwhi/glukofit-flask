@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import pickle
 import pandas as pd
+import awsgi
+
 
 app = Flask(__name__)
 
 # Muat model yang sudah dilatih
-model = pickle.load(open('best_model.pkl', 'rb'))
+model = pickle.load(open('model/best_model.pkl', 'rb'))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -24,6 +26,11 @@ def predict():
     }
     
     return jsonify(response)
+
+
+def lambda_handler(event, context):
+    return awsgi.response(app, event, context, base64_content_types={"image/png"})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
