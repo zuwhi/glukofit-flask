@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
 import pickle
 import pandas as pd
-import awsgi
-
 
 app = Flask(__name__)
 
@@ -26,10 +24,6 @@ def predict():
     }
     
     return jsonify(response)
-
-
-def lambda_handler(event, context):
-    return awsgi.response(app, event, context, base64_content_types={"image/png"})
 
 
 if __name__ == '__main__':
